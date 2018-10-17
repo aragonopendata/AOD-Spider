@@ -13,6 +13,7 @@ from email.MIMEText import MIMEText
 from jinja2 import Environment
 import psycopg2
 import telnetlib
+import datetime
 
 config = ConfigParser.RawConfigParser()
 config.read('./config.ini')
@@ -101,13 +102,13 @@ def saveStatus(url, res, service):
         if res != 200:
             saveErr(logFile, url, service)
         else:
-            logFile.write(url + ' -> OK' + '\r\n')
+            logFile.write("[" + datetime.datetime + "] " + url + ' -> OK' + '\r\n')
     except AttributeError as err:
             saveErr(logFile, url, service)
     logFile.close()
 
 def saveErr(logFile, url, service):
-    logFile.write(url + ' -> NOK' + '\r\n')
+    logFile.write("[" + datetime.datetime + "] " + url + ' -> NOK' + '\r\n')
     responseERR["errors"].append({
         "service": service,
         "url": url,
