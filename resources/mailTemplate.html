@@ -1,0 +1,35 @@
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>{{title}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+
+<body style="margin: 0; padding: 0;">
+    <h4>{{header}}</h4>
+    <table border="1" cellpadding="0" cellspacing="0">
+        <tr>
+            <th style="border-style: solid;">Servicio</th>
+            <th style="border-style: solid;">URL</th>
+        </tr>
+        {% for content in contentFile %}
+        {% if content.active != 0 %}
+        <tr>
+            <td style="padding: 5px;">{{content.service}}</td>
+            {% if content.url %}
+            <td style="padding: 5px;">{{content.url}}</td>
+            {% else %}
+            {% if content.port %}
+            <td style="padding: 5px;">{{content.host}}:{{content.port}}{{content.path}}</td>
+            {% else %}
+            <td style="padding: 5px;">{{content.host}}{{content.path}}</td>
+            {%endif%}
+            {%endif%}
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+</body>
+
+</html>

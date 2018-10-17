@@ -1,0 +1,138 @@
+[
+    {
+        "service": "Node",
+        "protocol": "%HTTP_PROTOCOL",
+        "host": "%FRONT_HOST",
+        "port": "%NODE_PORT",
+        "path": "/",
+        "active": 1
+    },
+    {
+        "service": "SolR",
+        "protocol": "%HTTP_PROTOCOL",
+        "host": "%BACK_HOST",
+        "port": "%SOLR_PORT",
+        "path": "/solr/",
+        "active": 1
+    },
+    {
+        "service": "CKAN",
+        "protocol": "%HTTPS_PROTOCOL",
+        "host": "%FRONTINTERNET_HOST",
+        "port": "",
+        "path": "/ckan/api",
+        "active": 0
+    },
+    {
+        "service": "Elastic",
+        "protocol": "%HTTPS_PROTOCOL",
+        "host": "%FRONTINTERNET_HOST",
+        "port": "",
+        "path": "/elastic/app/kibana",
+        "active": 1
+    },
+    {
+        "service": "Aragopedia",
+        "protocol": "%HTTPS_PROTOCOL",
+        "host": "%FRONTINTERNET_HOST",
+        "port": "",
+        "path": "/servicios/aragopedia/",
+        "active": 1
+    },
+    {
+        "service": "Presupuestos",
+        "protocol": "%HTTPS_PROTOCOL",
+        "host": "%PRESUS_HOST",
+        "port": "",
+        "path": "/",
+        "active": 1
+    },
+    {
+        "service": "Tomcat",
+        "protocol": "%HTTP_PROTOCOL",
+        "host": "%FRONT_HOST",
+        "port": "%TOMCAT_PORT",
+        "path": "/",
+        "active": 1
+    },
+    {
+        "service": "Visual Data Front",
+        "protocol": "%HTTPS_PROTOCOL",
+        "host": "%FRONTINTERNET_HOST",
+        "port": "",
+        "path": "/servicios/visualdata/",
+        "active": 1
+    },
+    {
+        "service": "Visual Data Back",
+        "protocol": "%HTTP_PROTOCOL",
+        "host": "%FRONT_HOST",
+        "port": "%VISUALDATA_PORT",
+        "path": "/",
+        "active": 1 
+    },
+    {
+        "service": "GA_OD_Core",
+        "protocol": "%HTTPS_PROTOCOL",
+        "host": "%FRONTINTERNET_HOST",
+        "port": "",
+        "path": "/GA_OD_Core",
+        "active": 0
+    },
+    {
+        "service": "CRAs",
+        "protocol": "%HTTPS_PROTOCOL",
+        "host": "%FRONTINTERNET_HOST",
+        "port": "",
+        "path": "/servicios/cras/",
+        "active": 1 
+    },
+    {
+        "service": "BBDD",
+        "protocol": "%HTTP_PROTOCOL",
+        "host": "%BACK_HOST",
+        "port": "%BBDD_PORT",
+        "path": "/",
+        "active": 1
+    },
+    {
+        "service": "MongoDB",
+        "protocol": "%HTTP_PROTOCOL",
+        "host": "%BACK_HOST",
+        "port": "%MONGO_PORT",
+        "path": "/",
+        "active": 1
+    },
+    {
+        "service": "Virtuoso",
+        "protocol": "%HTTP_PROTOCOL",
+        "host": "%BACK_HOST",
+        "port": "%VIRTUOSO_PORT",
+        "path": "/",
+        "active": 1
+    },
+    {
+        "service": "Social Data",
+        "protocol": "%HTTP_PROTOCOL",
+        "host": "%SOCIALDATA_HOST",
+        "port": "%SOCIALDATA_PORT",
+        "path": "/socialdata",
+        "active": 1
+    },
+    {
+        "service": "GITHUB",
+        "protocol": "%HTTPS_PROTOCOL",
+        "host": "github.com",
+        "port": "",
+        "path": "/aragonopendata/",
+        "active": 1
+    },
+    {
+        "service": "Open Data Pool",
+        "protocol": "%HTTPS_PROTOCOL",
+        "host": "%FRONTINTERNET_HOST",
+        "port": "%POOL_PORT",
+        "path": "/pool/",
+        "active": 0
+    }
+]
