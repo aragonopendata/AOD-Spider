@@ -102,13 +102,13 @@ def saveStatus(url, res, service):
         if res != 200:
             saveErr(logFile, url, service)
         else:
-            logFile.write("[" + datetime.datetime + "] " + url + ' -> OK' + '\r\n')
+            logFile.write("[" + str(datetime.datetime.now()) + "] " + url + ' -> OK' + '\r\n')
     except AttributeError as err:
             saveErr(logFile, url, service)
     logFile.close()
 
 def saveErr(logFile, url, service):
-    logFile.write("[" + datetime.datetime + "] " + url + ' -> NOK' + '\r\n')
+    logFile.write("[" + str(datetime.datetime.now()) + "] " + url + ' -> NOK' + '\r\n')
     responseERR["errors"].append({
         "service": service,
         "url": url,
