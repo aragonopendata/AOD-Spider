@@ -35,6 +35,8 @@ protocolHttps = config.get('PROTOCOL', 'HTTPS_PROTOCOL')
 
 coreViews = []
 
+fullTest = True
+
 responseERR = {
     "errors": []
 }
@@ -102,13 +104,19 @@ def saveStatus(url, res, service):
         if res != 200:
             saveErr(logFile, url, service)
         else:
-            logFile.write("[" + str(datetime.datetime.now()) + "] " + url + ' -> OK' + '\r\n')
+            if fullTest:
+                logFile.write("[" + str(datetime.datetime.now()) + "]" + " FULL " + url + ' -> OK' + '\r\n')
+            else:
+                logFile.write("[" + str(datetime.datetime.now()) + "]" + " BASIC " + url + ' -> OK' + '\r\n')
     except AttributeError as err:
             saveErr(logFile, url, service)
     logFile.close()
 
 def saveErr(logFile, url, service):
-    logFile.write("[" + str(datetime.datetime.now()) + "] " + url + ' -> NOK' + '\r\n')
+    if fullTest:
+        logFile.write("[" + str(datetime.datetime.now()) + "]" + " FULL " + url + ' -> NOK' + '\r\n')
+    else:
+        logFile.write("[" + str(datetime.datetime.now()) + "]" + " BASIC " + url + ' -> NOK' + '\r\n')
     responseERR["errors"].append({
         "service": service,
         "url": url,
@@ -131,14 +139,14 @@ def readGeneralConnectionsFile(file, jsonFiles):
         f = open(file["fileName"], 'r')
         contentFile = json.loads(f.read())
         for content in contentFile:
-            if content["active"] == 1 and content["host"] != "None":
+        if content["host"] != "None" and content["active"] == 1:
                 getProperties(content)
                 if file["type"] == "GA_OD_Core":
                     testConnection(protocolHttps, frontInternet, "", file["path"], file["type"])
                 else:
                     testConnection(content["protocol"], content["host"], content["port"], content["path"], content["service"])
             else:
-                if content["host"] != "None":
+                if content["active"] == 0:
                     setActive(content, jsonFiles)
         f.close()
 
@@ -226,6 +234,7 @@ def readData(file):
         f.close()
 
 def main():
+    checkFullTest()
     jsonFiles = json.dumps(files)
     jsonFiles = json.loads(jsonFiles)
     for file in jsonFiles['files']:
@@ -290,6 +299,15 @@ def connectToSMTPServer(fromaddr):
     server.starttls()
     server.login(fromaddr, config.get('EMAIL', 'PASS'))
     return server
+
+def checkFullTest():
+    global fullTest
+    f = open('./jsonFiles/static_URLs.json')
+    contentFile = json.loads(f.read())
+    for content in contentFile:
+        if content["active"] == 0 and content["host"] == "None":
+            fullTest = False
+    f.close()
     
 if __name__ == '__main__':
     main()
