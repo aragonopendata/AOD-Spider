@@ -136,13 +136,5 @@
         "port": "",
         "path": "/aragonopendata/",
         "active": 1
-    },
-    {
-        "service": "Open Data Pool",
-        "protocol": "%HTTPS_PROTOCOL",
-        "host": "%FRONTINTERNET_HOST",
-        "port": "%POOL_PORT",
-        "path": "/pool/",
-        "active": 0
     }
 ]
