@@ -21,7 +21,12 @@
         "host": "%FRONTINTERNET_HOST",
         "port": "",
         "path": "/ckan/api",
-        "active": 0
+        "active": 1
+    },
+    {
+        "service": "CKAN_RESOURCES",
+        "host": "None",
+        "active": 1
     },
     {
         "service": "Elastic",
@@ -77,7 +82,12 @@
         "host": "%FRONTINTERNET_HOST",
         "port": "",
         "path": "/GA_OD_Core",
-        "active": 0
+        "active": 1
+    },
+    {
+        "service": "GA_OD_Core_VIEWS",
+        "host": "None",
+        "active": 1
     },
     {
         "service": "CRAs",

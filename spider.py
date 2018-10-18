@@ -131,14 +131,15 @@ def readGeneralConnectionsFile(file, jsonFiles):
         f = open(file["fileName"], 'r')
         contentFile = json.loads(f.read())
         for content in contentFile:
-            if content["active"] == 1:
+            if content["active"] == 1 and content["host"] != "None":
                 getProperties(content)
                 if file["type"] == "GA_OD_Core":
                     testConnection(protocolHttps, frontInternet, "", file["path"], file["type"])
                 else:
                     testConnection(content["protocol"], content["host"], content["port"], content["path"], content["service"])
             else:
-                setActive(content, jsonFiles)
+                if content["host"] != "None":
+                    setActive(content, jsonFiles)
         f.close()
 
 def getProperties(content):
@@ -149,11 +150,11 @@ def getProperties(content):
         content["port"] = getProperty(str(content["port"])[1:])
 
 def setActive(content, jsonFiles):
-    if content["service"] == "CKAN":
+    if content["service"] == "CKAN_RESOURCES":
         jsonFiles[1]["active"] = 0
         jsonFiles[2]["active"] = 0
         jsonFiles[3]["active"] = 0
-    elif content["service"] == "GA_OD_Core":
+    elif content["service"] == "GA_OD_Core_VIEWS":
         jsonFiles[4]["active"] = 0
 
 def testConnection(protocol, host, port, path, service):
@@ -256,7 +257,8 @@ def buildMessage(fromaddr, toaddr):
         f = open('./jsonFiles/static_URLs.json', 'r')
         contentFile = json.loads(f.read())
         for content in contentFile:
-            getProperties(content)
+            if content["host"] != "None":
+                getProperties(content)
     renderTemplate(title, msg, contentFile)
     
     text = msg.as_string()
