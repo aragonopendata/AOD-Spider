@@ -54,28 +54,28 @@ files = {
             "fileName": "./jsonFiles/datasets.json",
             "path": "/api/action/package_list",
             "detailPath": "/api/action/package_show?id=",
-            "type": "Datasets",
+            "type": str(frontInternet) + "/datos/catalogo/dataset/",
             "active": 1
         },
         {
             "fileName": "./jsonFiles/topics.json",
             "path": "/api/action/group_list",
             "detailPath": "/api/action/group_show?id=",
-            "type": "Temas",
+            "type": str(frontInternet) + "/datos/catalogo/temas/",
             "active": 1
         },
         {
             "fileName": "./jsonFiles/organizations.json",
             "path": "/api/action/organization_list",
             "detailPath": "/api/action/organization_show?id=",
-            "type": "Organizaciones",
+            "type": str(frontInternet) + "/datos/catalogo/publicadores/",
             "active": 1
         },
         {
             "fileName": "./jsonFiles/coreViews.json",
             "path": "/GA_OD_Core/views",
             "detailPath": "/GA_OD_Core/show_columns?view_id=",
-            "type": "GA_OD_Core",
+            "type": str(frontInternet) + "/GA_OD_Core/preview?view_id=",
             "active": 1
         }
     ]
@@ -86,7 +86,7 @@ def getProperty(field):
     return str(config.get(section, field))
 
 def getJSONData(file):
-    if (file["type"] == "GA_OD_Core"):
+    if "GA_OD_Core" in file["type"]:
         url = buildURL(frontInternet, "", file["path"])
         conn = getConnectionType("https", frontInternet)
     else:
@@ -105,18 +105,18 @@ def saveStatus(url, res, service):
             saveErr(logFile, url, service)
         else:
             if fullTest:
-                logFile.write("[" + str(datetime.datetime.now()) + "]" + " FULL " + url + ' -> OK' + '\r\n')
+                logFile.write("[" + str(datetime.datetime.now()) + "]\t" + "FULL\t" + service + "\t" + url + '\t-> OK' + '\r\n')
             else:
-                logFile.write("[" + str(datetime.datetime.now()) + "]" + " BASIC " + url + ' -> OK' + '\r\n')
+                logFile.write("[" + str(datetime.datetime.now()) + "]\t" + "BASIC\t" + service + "\t" + url + '\t-> OK' + '\r\n')
     except AttributeError as err:
             saveErr(logFile, url, service)
     logFile.close()
 
 def saveErr(logFile, url, service):
     if fullTest:
-        logFile.write("[" + str(datetime.datetime.now()) + "]" + " FULL " + url + ' -> NOK' + '\r\n')
+        logFile.write("[" + str(datetime.datetime.now()) + "]\t" + "FULL\t" + service + "\t" + url + '\t-> NOK' + '\r\n')
     else:
-        logFile.write("[" + str(datetime.datetime.now()) + "]" + " BASIC " + url + ' -> NOK' + '\r\n')
+        logFile.write("[" + str(datetime.datetime.now()) + "]\t" + "BASIC\t" + service + "\t" + url + '\t-> NOK' + '\r\n')
     responseERR["errors"].append({
         "service": service,
         "url": url,
@@ -124,7 +124,7 @@ def saveErr(logFile, url, service):
 
 def writeFiles(file, res):
     f = open(file["fileName"], 'w')
-    if (file["type"] == "GA_OD_Core"):
+    if "GA_OD_Core" in file["type"]:
         coreViews = res.read()
         f.write(coreViews)
     else:
@@ -136,18 +136,18 @@ def resetFiles(file):
     open(file["fileName"], 'w').close()
     
 def readGeneralConnectionsFile(file, jsonFiles):
-        f = open(file["fileName"], 'r')
-        contentFile = json.loads(f.read())
-        for content in contentFile:
+    f = open(file["fileName"], 'r')
+    contentFile = json.loads(f.read())
+    for content in contentFile:
         if content["host"] != "None" and content["active"] == 1:
-                getProperties(content)
-                if file["type"] == "GA_OD_Core":
-                    testConnection(protocolHttps, frontInternet, "", file["path"], file["type"])
-                else:
-                    testConnection(content["protocol"], content["host"], content["port"], content["path"], content["service"])
+            getProperties(content)
+            if "GA_OD_Core" in file["type"]:
+                testConnection(protocolHttps, frontInternet, "", file["path"], file["type"])
             else:
-                if content["active"] == 0:
-                    setActive(content, jsonFiles)
+                testConnection(content["protocol"], content["host"], content["port"], content["path"], content["service"])
+        else:
+            if content["active"] == 0:
+                setActive(content, jsonFiles)
         f.close()
 
 def getProperties(content):
@@ -177,7 +177,7 @@ def testConnection(protocol, host, port, path, service):
             conn = getConnectionType(protocol, host)
             setConnectionPort(conn, port)
             res = makeRequest("GET", conn, path)
-            if service == "GA_OD_Core":
+            if "GA_OD_Core" in service:
                 if checkViewMsg(res):
                     res = res.status
                 else:
@@ -225,12 +225,12 @@ def readData(file):
     if file["active"] == 1:
         f = open(file["fileName"], 'r')
         contentFile = json.loads(f.read())
-        if file["type"] == "GA_OD_Core":
+        if "GA_OD_Core" in file["type"]:
             for content in contentFile:
-                testConnection(protocolHttps, frontInternet, "", file["detailPath"]+str(content[0]), file["type"])
+                testConnection(protocolHttps, frontInternet, "", file["detailPath"]+str(content[0]), file["type"]+str(content[0])+"&_pageSize=1&_page=1")
         else:
             for content in contentFile:
-                testConnection(protocolHttp, front, ckanPort, file["detailPath"]+content, file["type"])
+                testConnection(protocolHttp, front, ckanPort, file["detailPath"]+content, file["type"]+content)
         f.close()
 
 def main():
@@ -245,7 +245,30 @@ def main():
                 readData(file)
         else:
             readGeneralConnectionsFile(file, jsonFiles['files'])
-    sendReportByEmail()
+    if len(responseERR["errors"]) > 0 and not checkEmailRevision():
+        sendReportByEmail()
+        changeEmailRevision()
+
+def changeEmailRevision():
+    f = open('./emailRevision.json', 'r+')
+    content = json.loads(f.read())
+    if content["emailRevision"] == 0:
+        content["emailRevision"] = 1
+    else:
+        content["emailRevision"] = 0
+    f.seek(0)
+    f.write(json.dumps(content))
+    f.truncate()
+    f.close()
+
+def checkEmailRevision():
+    toCheck = True
+    f = open('./emailRevision.json', 'r')
+    content = json.loads(f.read())
+    if content["emailRevision"] == 0:
+        toCheck = False
+    f.close()
+    return toCheck
     
 def sendReportByEmail():
     print "Enviando informe de testeo de las conexiones por email..."
@@ -261,13 +284,6 @@ def buildMessage(fromaddr, toaddr):
     if len(responseERR["errors"]) > 0:
         title = "INFORME DE FALLOS EN LAS CONEXIONES: " + "\r\n"
         contentFile = responseERR["errors"]
-    else:
-        title = "TODAS LAS CONEXIONES A LOS SIGUIENTES SERVICIOS FUNCIONAN CORRECTAMENTE:" + "\r\n"
-        f = open('./jsonFiles/static_URLs.json', 'r')
-        contentFile = json.loads(f.read())
-        for content in contentFile:
-            if content["host"] != "None":
-                getProperties(content)
     renderTemplate(title, msg, contentFile)
     
     text = msg.as_string()
@@ -308,6 +324,6 @@ def checkFullTest():
         if content["active"] == 0 and content["host"] == "None":
             fullTest = False
     f.close()
-    
+
 if __name__ == '__main__':
     main()
