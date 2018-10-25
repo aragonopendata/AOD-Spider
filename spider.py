@@ -19,7 +19,7 @@ config = ConfigParser.RawConfigParser()
 config.read('./config.ini')
 
 #Log file
-log = "./spider.log"
+log = "/data/logs/spider/spider.log"
 
 environment = config.get('ENVIRONMENT', 'ENVIRONMENT')
 front = config.get('HOST', 'FRONT_HOST')
