@@ -20,6 +20,7 @@ config.read('./config.ini')
 
 #Log file
 log = "/data/logs/spider/spider.log"
+logtmp = "/data/logs/spider/spider_tmp.log"
 
 environment = config.get('ENVIRONMENT', 'ENVIRONMENT')
 front = config.get('HOST', 'FRONT_HOST')
@@ -99,7 +100,10 @@ def getJSONData(file):
     conn.close()
 
 def saveStatus(url, res, service):
-    logFile = open(log, 'a+')
+    if fullTest:
+        logFile = open(logtmp, 'a+')
+    else:
+        logFile = open(log, 'a+')
     try:
         if res != 200:
             saveErr(logFile, url, service)
@@ -235,6 +239,8 @@ def readData(file):
 
 def main():
     checkFullTest()
+    if fullTest:
+        clearLog()
     jsonFiles = json.dumps(files)
     jsonFiles = json.loads(jsonFiles)
     for file in jsonFiles['files']:
@@ -325,5 +331,23 @@ def checkFullTest():
             fullTest = False
     f.close()
 
+def clearLog():
+    nowDate = datetime.datetime.now()
+    dateLimit = nowDate - datetime.timedelta(hours=int(config.get('MIN_TIME_LOG', 'HOURS')), minutes=int(config.get('MIN_TIME_LOG', 'MINUTES')), seconds=int(config.get('MIN_TIME_LOG', 'SECONDS')))
+    fw = open(logtmp, 'w+')
+    with open(log) as fr:
+        for content in fr:
+            contentDate =  content.split('\t')[0]
+            contentDate = contentDate[1:-1]
+            contentDate = contentDate.split('.')[0]
+            contentDate = datetime.datetime.strptime(contentDate, "%Y-%m-%d %H:%M:%S")
+            if contentDate < dateLimit:
+                content = ""
+            else:
+                break
+        fw.writelines(fr)
+        fw.close()
+        fr.close()
+    
 if __name__ == '__main__':
     main()
